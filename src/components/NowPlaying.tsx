@@ -1,5 +1,5 @@
 import { Heart, Plus, Repeat, Repeat1, Shuffle, SkipBack, SkipForward, Pause, Play, X, Sparkles, Repeat2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { selectCurrent, usePlayer } from "@/lib/playerStore";
 import { ParticleField } from "./ParticleField";
 import { AlbumArt } from "./AlbumArt";
@@ -20,7 +20,8 @@ export function NowPlaying({ open, onClose }: Props) {
   const cycleRepeat = usePlayer((s) => s.cycleRepeat);
   const liked = usePlayer((s) => s.liked);
   const toggleLike = usePlayer((s) => s.toggleLike);
-  const moments = usePlayer((s) => s.moments.filter((m) => m.songId === song?.id));
+  const allMoments = usePlayer((s) => s.moments);
+  const moments = useMemo(() => allMoments.filter((m) => m.songId === song?.id), [allMoments, song?.id]);
   const addMoment = usePlayer((s) => s.addMoment);
   const position = usePlayer((s) => s.position);
   const duration = usePlayer((s) => s.duration);
