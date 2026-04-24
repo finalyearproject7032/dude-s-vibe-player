@@ -1,8 +1,11 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Lang, Mood, Song } from "@/lib/types";
-import { usePlayer } from "@/lib/playerStore";
+import { selectCurrent, usePlayer } from "@/lib/playerStore";
 import { SongRow } from "@/components/SongRow";
+import { AlbumArt } from "@/components/AlbumArt";
 import { timeOfDayGreeting } from "@/lib/playerUtils";
+import { useDudeNation } from "@/lib/dudeNationStore";
+import { DudeNationEditor } from "@/components/DudeNationEditor";
 
 const MOODS: (Mood | "All")[] = ["All", "Hype", "Mass", "Melody", "Emotional", "BGM"];
 const LANGS: ("All" | Lang)[] = ["All", "Telugu", "Tamil"];
@@ -12,10 +15,13 @@ type Props = { onPlay: (s: Song, queue?: string[]) => void };
 export function HomeView({ onPlay }: Props) {
   const songs = usePlayer((s) => s.songs);
   const recents = usePlayer((s) => s.recents);
+  const current = usePlayer(selectCurrent);
+  const isPlaying = usePlayer((s) => s.isPlaying);
   const lang = usePlayer((s) => s.langFilter);
   const mood = usePlayer((s) => s.moodFilter);
   const setLang = usePlayer((s) => s.setLangFilter);
   const setMood = usePlayer((s) => s.setMoodFilter);
+  const quotes = useDudeNation((s) => s.quotes);
 
   const filtered = useMemo(
     () => songs.filter((s) =>
@@ -34,10 +40,56 @@ export function HomeView({ onPlay }: Props) {
     return Array.from(map.entries());
   }, [filtered]);
 
-  const heroSong = recents[0]
-    ? songs.find((s) => s.id === recents[0]) ?? filtered[0]
-    : filtered[0];
+  // Hero: prefer currently playing, else most recent, else first filtered
+  const heroSong: Song | undefined =
+    current ??
+    (recents[0] ? songs.find((s) => s.id === recents[0]) : undefined) ??
+    filtered[0];
+
   const recentSongs = recents.map((id) => songs.find((s) => s.id === id)).filter(Boolean) as Song[];
+
+  // ==== Dude Nation: scroll-driven glow ====
+  const dnScrollRef = useRef<HTMLDivElement>(null);
+  const [activeQuoteIdx, setActiveQuoteIdx] = useState(0);
+
+  useEffect(() => {
+    const el = dnScrollRef.current;
+    if (!el) return;
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const center = el.scrollLeft + el.clientWidth / 2;
+        const cards = Array.from(el.querySelectorAll<HTMLElement>("[data-quote-card]"));
+        let bestIdx = 0;
+        let bestDist = Infinity;
+        cards.forEach((c, i) => {
+          const cardCenter = c.offsetLeft + c.offsetWidth / 2;
+          const d = Math.abs(cardCenter - center);
+          if (d < bestDist) { bestDist = d; bestIdx = i; }
+        });
+        setActiveQuoteIdx(bestIdx);
+      });
+    };
+    onScroll();
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, [quotes.length]);
+
+  const activeQuote = quotes[activeQuoteIdx] ?? quotes[0];
+  const dnGlowStyle = activeQuote
+    ? ({
+        // expose hues for nested elements that want to tint
+        ["--dn-h1" as string]: `${activeQuote.h1}`,
+        ["--dn-h2" as string]: `${activeQuote.h2}`,
+        background: `radial-gradient(120% 80% at 50% 0%, hsl(${activeQuote.h1} 80% 55% / 0.18), transparent 60%), radial-gradient(120% 80% at 50% 100%, hsl(${activeQuote.h2} 75% 45% / 0.15), transparent 60%)`,
+      } as React.CSSProperties)
+    : undefined;
+
+  const heroVibe = heroSong?.vibe ?? [258, 172];
 
   return (
     <div className="space-y-6 pb-32 animate-fade-in">
@@ -65,28 +117,26 @@ export function HomeView({ onPlay }: Props) {
         ))}
       </div>
 
-      {/* Hero */}
+      {/* Hero — Now Dropping (live updates with current song + poster) */}
       {heroSong && (
         <button
+          key={heroSong.id}
           onClick={() => onPlay(heroSong, filtered.map((x) => x.id))}
           className="relative block w-full overflow-hidden rounded-3xl glass-strong p-5 text-left pressable vibe-glow animate-scale-in"
         >
-          <div className="absolute inset-0 opacity-60" style={{ background: "var(--gradient-vibe)" }} />
+          <div
+            className="absolute inset-0 opacity-70"
+            style={{
+              background: `linear-gradient(135deg, hsl(${heroVibe[0]} 85% 45% / 0.85), hsl(${heroVibe[1]} 80% 30% / 0.85))`,
+            }}
+          />
           <div className="absolute inset-0 bg-background/40" />
           <div className="relative flex items-center gap-4">
-            <div className="rounded-2xl overflow-hidden">
-              <img
-                src=""
-                alt=""
-                className="hidden"
-              />
-              <div
-                className="h-24 w-24 rounded-2xl"
-                style={{ background: "var(--gradient-vibe)" }}
-              />
-            </div>
-            <div className="min-w-0">
-              <div className="text-[11px] uppercase tracking-widest text-foreground/80">Now Dropping</div>
+            <AlbumArt song={heroSong} size={96} spin={isPlaying} className="rounded-2xl" />
+            <div className="min-w-0 flex-1">
+              <div className="text-[11px] uppercase tracking-widest text-foreground/80">
+                {current && isPlaying ? "Now Playing" : "Now Dropping"}
+              </div>
               <div className="font-display text-xl font-bold truncate">{heroSong.title}</div>
               <div className="text-sm text-foreground/80 truncate">{heroSong.movie} · {heroSong.language}</div>
               <div className="mt-2 italic text-xs text-foreground/70 line-clamp-2">"{heroSong.quote}"</div>
@@ -144,45 +194,53 @@ export function HomeView({ onPlay }: Props) {
         </div>
       )}
 
-      {/* Dude Nation — feel quotes */}
-      <section className="pt-2">
+      {/* Dude Nation — feel quotes (scroll-driven glow) */}
+      <section
+        className="pt-2 -mx-4 px-4 py-4 rounded-3xl transition-[background] duration-500"
+        style={dnGlowStyle}
+      >
         <div className="flex items-baseline justify-between mb-3">
           <h2 className="font-display text-lg font-bold">Dude Nation</h2>
-          <span className="text-xs text-muted-foreground">for all the Dude lovers</span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-muted-foreground">for all the Dude lovers</span>
+            <DudeNationEditor />
+          </div>
         </div>
-        <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-2 snap-x snap-mandatory">
-          {DUDE_NATION_QUOTES.map((q, i) => (
-            <article
-              key={i}
-              style={{
-                animationDelay: `${i * 70}ms`,
-                background: `linear-gradient(135deg, hsl(${q.h1} 80% 22% / 0.55), hsl(${q.h2} 75% 14% / 0.55))`,
-              }}
-              className="snap-start shrink-0 w-[78%] sm:w-[46%] md:w-[34%] rounded-3xl glass-strong p-5 vibe-glow animate-fade-in relative overflow-hidden"
-            >
-              <div
-                className="absolute -top-10 -right-10 h-32 w-32 rounded-full opacity-40 blur-2xl"
-                style={{ background: `hsl(${q.h1} 90% 60%)` }}
-              />
-              <div className="text-[10px] uppercase tracking-[0.3em] text-foreground/70">{q.tag}</div>
-              <blockquote className="font-display text-lg font-bold leading-snug mt-2 text-balance">
-                "{q.text}"
-              </blockquote>
-              <div className="mt-3 text-xs text-foreground/60">— {q.author}</div>
-            </article>
-          ))}
+        <div
+          ref={dnScrollRef}
+          className="flex gap-3 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-2 snap-x snap-mandatory"
+        >
+          {quotes.map((q, i) => {
+            const isActive = i === activeQuoteIdx;
+            return (
+              <article
+                key={q.id}
+                data-quote-card
+                style={{
+                  animationDelay: `${i * 70}ms`,
+                  background: `linear-gradient(135deg, hsl(${q.h1} 80% 22% / 0.55), hsl(${q.h2} 75% 14% / 0.55))`,
+                  boxShadow: isActive
+                    ? `0 10px 40px -10px hsl(${q.h1} 90% 55% / 0.55)`
+                    : undefined,
+                }}
+                className={`snap-center shrink-0 w-[78%] sm:w-[46%] md:w-[34%] rounded-3xl glass-strong p-5 animate-fade-in relative overflow-hidden transition-transform duration-300 ${
+                  isActive ? "scale-[1.02]" : "scale-[0.97] opacity-80"
+                }`}
+              >
+                <div
+                  className="absolute -top-10 -right-10 h-32 w-32 rounded-full opacity-40 blur-2xl"
+                  style={{ background: `hsl(${q.h1} 90% 60%)` }}
+                />
+                <div className="text-[10px] uppercase tracking-[0.3em] text-foreground/70">{q.tag}</div>
+                <blockquote className="font-display text-lg font-bold leading-snug mt-2 text-balance">
+                  "{q.text}"
+                </blockquote>
+                <div className="mt-3 text-xs text-foreground/60">— {q.author}</div>
+              </article>
+            );
+          })}
         </div>
       </section>
     </div>
   );
 }
-
-const DUDE_NATION_QUOTES: { text: string; author: string; tag: string; h1: number; h2: number }[] = [
-  { text: "Some bros lift weights. The Dude lifts vibes.", author: "Dude Nation", tag: "Mass Energy", h1: 280, h2: 330 },
-  { text: "Play it loud enough and even silence asks for a re-run.", author: "Bro Tier", tag: "Hype", h1: 12, h2: 280 },
-  { text: "Heartbreak hits. Dude songs hug back.", author: "Late Night Loop", tag: "Emotional", h1: 220, h2: 290 },
-  { text: "We don't follow the trend. The Dude IS the trend.", author: "The Universe", tag: "Statement", h1: 340, h2: 30 },
-  { text: "One earphone for you, one for the Dude. That's the rule.", author: "Bus Window Gang", tag: "Melody", h1: 300, h2: 200 },
-  { text: "Telugu or Tamil — the Dude speaks fluent feel.", author: "Dude Nation", tag: "Universal", h1: 190, h2: 280 },
-  { text: "Replay isn't a button. It's a lifestyle.", author: "Repeat One Club", tag: "Loop Life", h1: 258, h2: 172 },
-];
