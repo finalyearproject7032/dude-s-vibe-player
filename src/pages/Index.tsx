@@ -1,16 +1,44 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { AudioEngine } from "@/lib/audioEngine";
+import { useVibeColor } from "@/lib/useVibeColor";
+import { usePlayer } from "@/lib/playerStore";
+import type { Song } from "@/lib/types";
+import { BottomNav, type Tab } from "@/components/BottomNav";
+import { MiniPlayer } from "@/components/MiniPlayer";
+import { NowPlaying } from "@/components/NowPlaying";
+import { HomeView } from "@/views/HomeView";
+import { LibraryView } from "@/views/LibraryView";
+import { SearchView } from "@/views/SearchView";
+import { AddSongView } from "@/views/AddSongView";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const Index = () => {
+  useVibeColor();
+  const [tab, setTab] = useState<Tab>("home");
+  const [npOpen, setNpOpen] = useState(false);
+  const playSong = usePlayer((s) => s.playSong);
+  const currentId = usePlayer((s) => s.currentId);
+
+  const onPlay = (song: Song, queue?: string[]) => {
+    playSong(song.id, queue);
+    setNpOpen(true);
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="relative min-h-screen">
+      <AudioEngine />
+
+      <main className="relative z-10 mx-auto max-w-md px-4 pt-6">
+        {tab === "home" && <HomeView onPlay={onPlay} />}
+        {tab === "search" && <SearchView onPlay={onPlay} />}
+        {tab === "add" && <AddSongView onAdded={() => setTab("library")} />}
+        {tab === "library" && <LibraryView onPlay={onPlay} />}
+      </main>
+
+      {currentId && <MiniPlayer onExpand={() => setNpOpen(true)} />}
+      <BottomNav tab={tab} onTab={setTab} />
+      <NowPlaying open={npOpen} onClose={() => setNpOpen(false)} />
     </div>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
