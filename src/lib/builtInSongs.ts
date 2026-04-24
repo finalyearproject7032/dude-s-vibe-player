@@ -1,4 +1,10 @@
 import type { Song } from "./types";
+import posterFist from "@/assets/posters/dude-fist.jpg";
+import posterDiwali from "@/assets/posters/dude-diwali.jpg";
+import posterGang from "@/assets/posters/dude-gang.jpg";
+import posterTopGear from "@/assets/posters/dude-topgear.jpg";
+import posterEmotional from "@/assets/posters/dude-emotional.jpg";
+import posterReview from "@/assets/posters/dude-review.jpg";
 
 // Built-in Dude collection. Metadata inferred from filenames.
 // vibe = [hue1, hue2] used to repaint the UI per song.
@@ -11,6 +17,7 @@ export const BUILT_IN_SONGS: Song[] = [
     mood: "Mass",
     singer: "Sai Abhyankkar",
     src: "/songs/dude-trailer-blast.mp3",
+    poster: posterFist,
     vibe: [258, 330],
     quote: "When the trailer drops harder than the movie. Dude effect activated.",
     builtIn: true,
@@ -23,6 +30,7 @@ export const BUILT_IN_SONGS: Song[] = [
     mood: "Hype",
     singer: "Sai Abhyankkar",
     src: "/songs/blud-is-on-his-way.mp3",
+    poster: posterTopGear,
     vibe: [12, 280],
     quote: "Bro is not coming. Bro has arrived. Stand back.",
     builtIn: true,
@@ -35,6 +43,7 @@ export const BUILT_IN_SONGS: Song[] = [
     mood: "Mass",
     singer: "Sai Abhyankkar",
     src: "/songs/boom-boom.mp3",
+    poster: posterDiwali,
     vibe: [340, 30],
     quote: "Two booms. Zero rupees. Infinite reload.",
     builtIn: true,
@@ -47,6 +56,7 @@ export const BUILT_IN_SONGS: Song[] = [
     mood: "Melody",
     singer: "Sai Abhyankkar",
     src: "/songs/singari.mp3",
+    poster: posterReview,
     vibe: [300, 200],
     quote: "Some names you whisper. Some you melt into. Singari is both.",
     builtIn: true,
@@ -59,6 +69,7 @@ export const BUILT_IN_SONGS: Song[] = [
     mood: "Hype",
     singer: "Sai Abhyankkar",
     src: "/songs/baagundu-po.mp3",
+    poster: posterGang,
     vibe: [190, 280],
     quote: "Feels good. Now go. The Dude approves.",
     builtIn: true,
@@ -71,6 +82,7 @@ export const BUILT_IN_SONGS: Song[] = [
     mood: "Hype",
     singer: "Sai Abhyankkar",
     src: "/songs/nallaru-po.mp3",
+    poster: posterTopGear,
     vibe: [170, 270],
     quote: "Be good. Then leave. The Dude philosophy in two words.",
     builtIn: true,
@@ -83,6 +95,7 @@ export const BUILT_IN_SONGS: Song[] = [
     mood: "Emotional",
     singer: "Sai Abhyankkar",
     src: "/songs/kannukulla-reprise.mp3",
+    poster: posterEmotional,
     vibe: [220, 290],
     quote: "Inside the eyes — a whole movie no one else gets to watch.",
     builtIn: true,
@@ -95,6 +108,7 @@ export const BUILT_IN_SONGS: Song[] = [
     mood: "Emotional",
     singer: "Sai Abhyankkar",
     src: "/songs/oorum-blood-unplugged.mp3",
+    poster: posterFist,
     vibe: [350, 260],
     quote: "Strip the beat. The blood still hums.",
     builtIn: true,
@@ -107,6 +121,7 @@ export const BUILT_IN_SONGS: Song[] = [
     mood: "Melody",
     singer: "Sai Abhyankkar",
     src: "/songs/nee-gunde-lona.mp3",
+    poster: posterEmotional,
     vibe: [320, 220],
     quote: "Inside your heart — a quiet riot wearing your name.",
     builtIn: true,
