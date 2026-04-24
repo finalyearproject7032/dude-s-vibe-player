@@ -143,6 +143,46 @@ export function HomeView({ onPlay }: Props) {
           <div className="text-sm text-muted-foreground mt-1">Try a different language or mood.</div>
         </div>
       )}
+
+      {/* Dude Nation — feel quotes */}
+      <section className="pt-2">
+        <div className="flex items-baseline justify-between mb-3">
+          <h2 className="font-display text-lg font-bold">Dude Nation</h2>
+          <span className="text-xs text-muted-foreground">for all the Dude lovers</span>
+        </div>
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-2 snap-x snap-mandatory">
+          {DUDE_NATION_QUOTES.map((q, i) => (
+            <article
+              key={i}
+              style={{
+                animationDelay: `${i * 70}ms`,
+                background: `linear-gradient(135deg, hsl(${q.h1} 80% 22% / 0.55), hsl(${q.h2} 75% 14% / 0.55))`,
+              }}
+              className="snap-start shrink-0 w-[78%] sm:w-[46%] md:w-[34%] rounded-3xl glass-strong p-5 vibe-glow animate-fade-in relative overflow-hidden"
+            >
+              <div
+                className="absolute -top-10 -right-10 h-32 w-32 rounded-full opacity-40 blur-2xl"
+                style={{ background: `hsl(${q.h1} 90% 60%)` }}
+              />
+              <div className="text-[10px] uppercase tracking-[0.3em] text-foreground/70">{q.tag}</div>
+              <blockquote className="font-display text-lg font-bold leading-snug mt-2 text-balance">
+                "{q.text}"
+              </blockquote>
+              <div className="mt-3 text-xs text-foreground/60">— {q.author}</div>
+            </article>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
+
+const DUDE_NATION_QUOTES: { text: string; author: string; tag: string; h1: number; h2: number }[] = [
+  { text: "Some bros lift weights. The Dude lifts vibes.", author: "Dude Nation", tag: "Mass Energy", h1: 280, h2: 330 },
+  { text: "Play it loud enough and even silence asks for a re-run.", author: "Bro Tier", tag: "Hype", h1: 12, h2: 280 },
+  { text: "Heartbreak hits. Dude songs hug back.", author: "Late Night Loop", tag: "Emotional", h1: 220, h2: 290 },
+  { text: "We don't follow the trend. The Dude IS the trend.", author: "The Universe", tag: "Statement", h1: 340, h2: 30 },
+  { text: "One earphone for you, one for the Dude. That's the rule.", author: "Bus Window Gang", tag: "Melody", h1: 300, h2: 200 },
+  { text: "Telugu or Tamil — the Dude speaks fluent feel.", author: "Dude Nation", tag: "Universal", h1: 190, h2: 280 },
+  { text: "Replay isn't a button. It's a lifestyle.", author: "Repeat One Club", tag: "Loop Life", h1: 258, h2: 172 },
+];
