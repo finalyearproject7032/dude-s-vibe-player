@@ -1,9 +1,14 @@
-import { Heart, Plus, Repeat, Repeat1, Shuffle, SkipBack, SkipForward, Pause, Play, X, Sparkles, Repeat2 } from "lucide-react";
+import { Heart, Plus, Repeat, Repeat1, Shuffle, SkipBack, SkipForward, Pause, Play, X, Sparkles, Repeat2, Share2, Moon, Flame } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { selectCurrent, usePlayer } from "@/lib/playerStore";
 import { ParticleField } from "./ParticleField";
 import { AlbumArt } from "./AlbumArt";
 import { WaveformScrubber } from "./WaveformScrubber";
+import { LyricsCard } from "./LyricsCard";
+import { SleepTimer } from "./SleepTimer";
+import { useReplay } from "@/lib/replayStore";
+import { buildShareUrl, shareOrCopy } from "@/lib/share";
+import { toast } from "sonner";
 import { haptic } from "@/lib/playerUtils";
 
 type Props = { open: boolean; onClose: () => void };
@@ -82,6 +87,24 @@ export function NowPlaying({ open, onClose }: Props) {
     const end = Math.min(duration || start + 10, start + 10);
     setLoop({ start, end });
     haptic("heavy");
+  };
+
+  const top = useReplay((s) => s.topMoment(song?.id ?? ""));
+  const fmt = (t: number) => `${Math.floor(t / 60)}:${Math.floor(t % 60).toString().padStart(2, "0")}`;
+
+  const onSharePlain = async () => {
+    if (!song) return;
+    const url = buildShareUrl(song.id);
+    const action = await shareOrCopy(`${song.title} — Dudify`, `Listen to ${song.title} on Dudify`, url);
+    toast.success(action === "shared" ? "Shared!" : "Link copied — paste anywhere.");
+  };
+  const onShareMoment = async () => {
+    if (!song) return;
+    const t = top ? top.start : Math.floor(position);
+    const url = buildShareUrl(song.id, t);
+    const label = top ? `the most-replayed 10s of ${song.title}` : `${song.title} @ ${fmt(t)}`;
+    const action = await shareOrCopy(`Listen to ${label}`, `🔥 ${label}`, url);
+    toast.success(action === "shared" ? "Moment shared." : "Moment link copied 🔥");
   };
 
   return (
