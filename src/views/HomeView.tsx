@@ -223,19 +223,36 @@ export function HomeView({ onPlay }: Props) {
                     ? `0 10px 40px -10px hsl(${q.h1} 90% 55% / 0.55)`
                     : undefined,
                 }}
-                className={`snap-center shrink-0 w-[78%] sm:w-[46%] md:w-[34%] rounded-3xl glass-strong p-5 animate-fade-in relative overflow-hidden transition-transform duration-300 ${
+                className={`snap-center shrink-0 w-[78%] sm:w-[46%] md:w-[34%] rounded-3xl glass-strong p-5 animate-fade-in relative overflow-hidden transition-transform duration-300 min-h-[180px] ${
                   isActive ? "scale-[1.02]" : "scale-[0.97] opacity-80"
                 }`}
               >
+                {q.poster && (
+                  <>
+                    <img
+                      src={q.poster}
+                      alt=""
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                    <div
+                      className="absolute inset-0"
+                      style={{
+                        background: `linear-gradient(135deg, hsl(${q.h1} 80% 18% / 0.65), hsl(${q.h2} 75% 10% / 0.85))`,
+                      }}
+                    />
+                  </>
+                )}
                 <div
                   className="absolute -top-10 -right-10 h-32 w-32 rounded-full opacity-40 blur-2xl"
                   style={{ background: `hsl(${q.h1} 90% 60%)` }}
                 />
-                <div className="text-[10px] uppercase tracking-[0.3em] text-foreground/70">{q.tag}</div>
-                <blockquote className="font-display text-lg font-bold leading-snug mt-2 text-balance">
-                  "{q.text}"
-                </blockquote>
-                <div className="mt-3 text-xs text-foreground/60">— {q.author}</div>
+                <div className="relative">
+                  <div className="text-[10px] uppercase tracking-[0.3em] text-foreground/70">{q.tag}</div>
+                  <blockquote className="font-display text-lg font-bold leading-snug mt-2 text-balance">
+                    "{q.text}"
+                  </blockquote>
+                  <div className="mt-3 text-xs text-foreground/60">— {q.author}</div>
+                </div>
               </article>
             );
           })}
