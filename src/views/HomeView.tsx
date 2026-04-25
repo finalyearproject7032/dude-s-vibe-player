@@ -180,6 +180,9 @@ export function HomeView({ onPlay }: Props) {
         </section>
       )}
 
+      {/* Mood Mixes */}
+      <MoodMixes onPlay={onPlay} />
+
       {/* By Movie */}
       {byMovie.map(([movie, list], idx) => (
         <section key={movie} style={{ animationDelay: `${idx * 60}ms` }} className="animate-fade-in">
