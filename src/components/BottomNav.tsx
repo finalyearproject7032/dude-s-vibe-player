@@ -1,6 +1,6 @@
-import { Home, Library, Plus, Search } from "lucide-react";
+import { Home, Images, Library, Plus, Search } from "lucide-react";
 
-export type Tab = "home" | "search" | "add" | "library";
+export type Tab = "home" | "search" | "add" | "library" | "gallery";
 
 type Props = { tab: Tab; onTab: (t: Tab) => void };
 
@@ -9,6 +9,7 @@ const items: { id: Tab; label: string; Icon: any }[] = [
   { id: "search", label: "Search", Icon: Search },
   { id: "add", label: "Add", Icon: Plus },
   { id: "library", label: "Library", Icon: Library },
+  { id: "gallery", label: "Gallery", Icon: Images },
 ];
 
 export function BottomNav({ tab, onTab }: Props) {
