@@ -4,8 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { ImagePlus, Pencil, Plus, RotateCcw, Trash2, X } from "lucide-react";
+import { ImagePlus, Images, Pencil, Plus, RotateCcw, Trash2, X } from "lucide-react";
 import { useDudeNation } from "@/lib/dudeNationStore";
+import { useDudeGallery } from "@/lib/dudeGalleryStore";
+import { useState } from "react";
 import { toast } from "sonner";
 
 const readAsDataURL = (f: File) =>
