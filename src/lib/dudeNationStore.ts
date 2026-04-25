@@ -8,6 +8,7 @@ export type DudeQuote = {
   tag: string;
   h1: number; // 0-360
   h2: number; // 0-360
+  poster?: string; // optional data URL background image
 };
 
 export const DEFAULT_QUOTES: DudeQuote[] = [

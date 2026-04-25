@@ -4,8 +4,17 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Pencil, Plus, RotateCcw, Trash2 } from "lucide-react";
+import { ImagePlus, Pencil, Plus, RotateCcw, Trash2, X } from "lucide-react";
 import { useDudeNation } from "@/lib/dudeNationStore";
+import { toast } from "sonner";
+
+const readAsDataURL = (f: File) =>
+  new Promise<string>((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result as string);
+    r.onerror = rej;
+    r.readAsDataURL(f);
+  });
 
 type Props = {
   trigger?: React.ReactNode;
@@ -120,6 +129,42 @@ export function DudeNationEditor({ trigger }: Props) {
                     onValueChange={([v]) => update(q.id, { h2: v })}
                   />
                 </div>
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs">Background image (optional)</Label>
+                <div className="flex items-center gap-3">
+                  <label className="flex-1 inline-flex items-center gap-2 rounded-xl border border-border bg-background/60 px-3 py-2 cursor-pointer pressable text-xs">
+                    <ImagePlus className="h-4 w-4" />
+                    <span className="truncate">{q.poster ? "Replace image" : "Upload image"}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      hidden
+                      onChange={async (e) => {
+                        const f = e.target.files?.[0];
+                        if (!f) return;
+                        if (f.size > 5 * 1024 * 1024) { toast.error("Image > 5MB."); return; }
+                        try {
+                          const url = await readAsDataURL(f);
+                          update(q.id, { poster: url });
+                        } catch { toast.error("Couldn't read image."); }
+                      }}
+                    />
+                  </label>
+                  {q.poster && (
+                    <button
+                      onClick={() => update(q.id, { poster: undefined })}
+                      className="p-2 rounded-lg border border-border pressable"
+                      aria-label="Remove image"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+                {q.poster && (
+                  <img src={q.poster} alt="" className="mt-2 h-20 w-full object-cover rounded-lg" />
+                )}
               </div>
             </div>
           ))}

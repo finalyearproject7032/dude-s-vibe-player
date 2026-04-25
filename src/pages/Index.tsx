@@ -10,6 +10,7 @@ import { HomeView } from "@/views/HomeView";
 import { LibraryView } from "@/views/LibraryView";
 import { SearchView } from "@/views/SearchView";
 import { AddSongView } from "@/views/AddSongView";
+import { GalleryView } from "@/views/GalleryView";
 
 const Index = () => {
   useVibeColor();
@@ -32,6 +33,7 @@ const Index = () => {
         {tab === "search" && <SearchView onPlay={onPlay} />}
         {tab === "add" && <AddSongView onAdded={() => setTab("library")} />}
         {tab === "library" && <LibraryView onPlay={onPlay} />}
+        {tab === "gallery" && <GalleryView />}
       </main>
 
       {currentId && <MiniPlayer onExpand={() => setNpOpen(true)} />}

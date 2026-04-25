@@ -19,15 +19,37 @@ export function AddSongView({ onAdded }: { onAdded: () => void }) {
   const [previewing, setPreviewing] = useState(false);
   const previewRef = useRef<HTMLAudioElement | null>(null);
 
-  const onAudio = (f: File | null) => {
+  const readAsDataURL = (f: File) =>
+    new Promise<string>((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result as string);
+      r.onerror = reject;
+      r.readAsDataURL(f);
+    });
+
+  const onAudio = async (f: File | null) => {
     if (!f) return;
-    setAudioUrl(URL.createObjectURL(f));
-    setAudioName(f.name);
-    if (!title) setTitle(f.name.replace(/\.(mp3|m4a|wav|aac)$/i, "").replace(/[_-]/g, " "));
+    if (f.size > 25 * 1024 * 1024) {
+      toast.error("Audio over 25MB — pick a smaller file so it stays saved.");
+      return;
+    }
+    try {
+      const dataUrl = await readAsDataURL(f);
+      setAudioUrl(dataUrl);
+      setAudioName(f.name);
+      if (!title) setTitle(f.name.replace(/\.(mp3|m4a|wav|aac)$/i, "").replace(/[_-]/g, " "));
+    } catch {
+      toast.error("Couldn't read that audio file.");
+    }
   };
-  const onPoster = (f: File | null) => {
+  const onPoster = async (f: File | null) => {
     if (!f) return;
-    setPoster(URL.createObjectURL(f));
+    try {
+      const dataUrl = await readAsDataURL(f);
+      setPoster(dataUrl);
+    } catch {
+      toast.error("Couldn't read that image.");
+    }
   };
 
   const togglePreview = () => {
