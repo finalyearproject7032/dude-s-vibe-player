@@ -130,8 +130,6 @@ export function DudeNationEditor({ trigger }: Props) {
                   />
                 </div>
               </div>
-            </div>
-          ))}
 
               <div className="space-y-1">
                 <Label className="text-xs">Background image (optional)</Label>
