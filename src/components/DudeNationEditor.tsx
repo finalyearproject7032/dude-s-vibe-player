@@ -28,6 +28,8 @@ export function DudeNationEditor({ trigger }: Props) {
   const add = useDudeNation((s) => s.add);
   const remove = useDudeNation((s) => s.remove);
   const reset = useDudeNation((s) => s.reset);
+  const galleryItems = useDudeGallery((s) => s.items);
+  const [pickerFor, setPickerFor] = useState<string | null>(null);
 
   return (
     <Sheet>
