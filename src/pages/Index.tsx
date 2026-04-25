@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AudioEngine } from "@/lib/audioEngine";
 import { useVibeColor } from "@/lib/useVibeColor";
 import { usePlayer } from "@/lib/playerStore";
@@ -18,11 +18,37 @@ const Index = () => {
   const [npOpen, setNpOpen] = useState(false);
   const playSong = usePlayer((s) => s.playSong);
   const currentId = usePlayer((s) => s.currentId);
+  const songs = usePlayer((s) => s.songs);
 
   const onPlay = (song: Song, queue?: string[]) => {
     playSong(song.id, queue);
     setNpOpen(true);
   };
+
+  // ===== Deep link: /s/:id?t=42 =====
+  useEffect(() => {
+    const m = window.location.pathname.match(/^\/s\/([^/]+)\/?$/);
+    if (!m) return;
+    const id = decodeURIComponent(m[1]);
+    const params = new URLSearchParams(window.location.search);
+    const t = Number(params.get("t") ?? "0");
+    const target = songs.find((s) => s.id === id);
+    if (target) {
+      playSong(target.id);
+      setNpOpen(true);
+      if (t > 0) {
+        // wait for audio src to load
+        setTimeout(() => {
+          const a = document.querySelector("audio");
+          if (a) a.currentTime = t;
+        }, 600);
+      }
+      // clean URL so refresh doesn't re-trigger after navigation
+      window.history.replaceState({}, "", "/");
+    }
+    // intentionally only run once on first mount with the songs list available
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="relative min-h-screen">

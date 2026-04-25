@@ -1,9 +1,14 @@
-import { Heart, Plus, Repeat, Repeat1, Shuffle, SkipBack, SkipForward, Pause, Play, X, Sparkles, Repeat2 } from "lucide-react";
+import { Heart, Plus, Repeat, Repeat1, Shuffle, SkipBack, SkipForward, Pause, Play, X, Sparkles, Repeat2, Share2, Moon, Flame } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { selectCurrent, usePlayer } from "@/lib/playerStore";
 import { ParticleField } from "./ParticleField";
 import { AlbumArt } from "./AlbumArt";
 import { WaveformScrubber } from "./WaveformScrubber";
+import { LyricsCard } from "./LyricsCard";
+import { SleepTimer } from "./SleepTimer";
+import { useReplay } from "@/lib/replayStore";
+import { buildShareUrl, shareOrCopy } from "@/lib/share";
+import { toast } from "sonner";
 import { haptic } from "@/lib/playerUtils";
 
 type Props = { open: boolean; onClose: () => void };
@@ -82,6 +87,24 @@ export function NowPlaying({ open, onClose }: Props) {
     const end = Math.min(duration || start + 10, start + 10);
     setLoop({ start, end });
     haptic("heavy");
+  };
+
+  const top = useReplay((s) => s.topMoment(song?.id ?? ""));
+  const fmt = (t: number) => `${Math.floor(t / 60)}:${Math.floor(t % 60).toString().padStart(2, "0")}`;
+
+  const onSharePlain = async () => {
+    if (!song) return;
+    const url = buildShareUrl(song.id);
+    const action = await shareOrCopy(`${song.title} — Dudify`, `Listen to ${song.title} on Dudify`, url);
+    toast.success(action === "shared" ? "Shared!" : "Link copied — paste anywhere.");
+  };
+  const onShareMoment = async () => {
+    if (!song) return;
+    const t = top ? top.start : Math.floor(position);
+    const url = buildShareUrl(song.id, t);
+    const label = top ? `the most-replayed 10s of ${song.title}` : `${song.title} @ ${fmt(t)}`;
+    const action = await shareOrCopy(`Listen to ${label}`, `🔥 ${label}`, url);
+    toast.success(action === "shared" ? "Moment shared." : "Moment link copied 🔥");
   };
 
   return (
@@ -175,7 +198,7 @@ export function NowPlaying({ open, onClose }: Props) {
 
           {/* Secondary actions */}
           <div className="mt-4 flex items-center justify-around glass rounded-2xl p-2">
-            <button onClick={onLike} className="relative flex flex-col items-center gap-1 px-3 py-2 pressable">
+            <button onClick={onLike} className="relative flex flex-col items-center gap-1 px-2 py-2 pressable">
               <Heart className={`h-5 w-5 ${isLiked ? "fill-highlight text-highlight" : "text-foreground/80"}`} />
               <span className="text-[11px] text-muted-foreground">{isLiked ? "Bro Tier" : "Like"}</span>
               {hearts.map((k) => (
@@ -186,18 +209,53 @@ export function NowPlaying({ open, onClose }: Props) {
                 />
               ))}
             </button>
-            <button onClick={onMark} className="flex flex-col items-center gap-1 px-3 py-2 pressable">
+            <button onClick={onMark} className="flex flex-col items-center gap-1 px-2 py-2 pressable">
               <Sparkles className="h-5 w-5 text-accent" />
-              <span className="text-[11px] text-muted-foreground">Mark Vibe</span>
+              <span className="text-[11px] text-muted-foreground">Mark</span>
             </button>
-            <button onClick={onLoopToggle} className="flex flex-col items-center gap-1 px-3 py-2 pressable">
+            <button onClick={onLoopToggle} className="flex flex-col items-center gap-1 px-2 py-2 pressable">
               <Repeat2 className={`h-5 w-5 ${loop ? "text-accent" : "text-foreground/80"}`} />
-              <span className="text-[11px] text-muted-foreground">{loop ? "Loop on" : "A↔B Loop"}</span>
+              <span className="text-[11px] text-muted-foreground">{loop ? "Loop on" : "A↔B"}</span>
             </button>
-            <button onClick={() => haptic("light")} className="flex flex-col items-center gap-1 px-3 py-2 pressable">
-              <Plus className="h-5 w-5 text-foreground/80" />
-              <span className="text-[11px] text-muted-foreground">Playlist</span>
+            <button onClick={onSharePlain} className="flex flex-col items-center gap-1 px-2 py-2 pressable">
+              <Share2 className="h-5 w-5 text-foreground/80" />
+              <span className="text-[11px] text-muted-foreground">Share</span>
             </button>
+            <SleepTimer
+              trigger={
+                <button className="flex flex-col items-center gap-1 px-2 py-2 pressable">
+                  <Moon className="h-5 w-5 text-foreground/80" />
+                  <span className="text-[11px] text-muted-foreground">Sleep</span>
+                </button>
+              }
+            />
+          </div>
+
+          {/* Most-replayed callout */}
+          {top && (
+            <button
+              onClick={onShareMoment}
+              className="mt-3 w-full glass-strong rounded-2xl p-3 flex items-center gap-3 pressable text-left"
+              style={{ boxShadow: "0 8px 30px -10px hsl(var(--vibe) / 0.5)" }}
+            >
+              <div className="grid place-items-center h-10 w-10 rounded-xl" style={{ background: "var(--gradient-vibe)" }}>
+                <Flame className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Most replayed</div>
+                <div className="text-sm font-semibold truncate">
+                  {fmt(top.start)}–{fmt(top.end)} of {song.title}
+                </div>
+              </div>
+              <div className="flex items-center gap-1 text-xs text-vibe">
+                <Share2 className="h-3.5 w-3.5" /> share
+              </div>
+            </button>
+          )}
+
+          {/* Lyrics */}
+          <div className="mt-3">
+            <LyricsCard song={song} position={position} />
           </div>
 
           {moments.length > 0 && (

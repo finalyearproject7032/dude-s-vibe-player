@@ -4,8 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { ImagePlus, Pencil, Plus, RotateCcw, Trash2, X } from "lucide-react";
+import { ImagePlus, Images, Pencil, Plus, RotateCcw, Trash2, X } from "lucide-react";
 import { useDudeNation } from "@/lib/dudeNationStore";
+import { useDudeGallery } from "@/lib/dudeGalleryStore";
+import { useState } from "react";
 import { toast } from "sonner";
 
 const readAsDataURL = (f: File) =>
@@ -26,6 +28,8 @@ export function DudeNationEditor({ trigger }: Props) {
   const add = useDudeNation((s) => s.add);
   const remove = useDudeNation((s) => s.remove);
   const reset = useDudeNation((s) => s.reset);
+  const galleryItems = useDudeGallery((s) => s.items);
+  const [pickerFor, setPickerFor] = useState<string | null>(null);
 
   return (
     <Sheet>
@@ -162,6 +166,35 @@ export function DudeNationEditor({ trigger }: Props) {
                     </button>
                   )}
                 </div>
+
+                {galleryItems.length > 0 && (
+                  <button
+                    onClick={() => setPickerFor(pickerFor === q.id ? null : q.id)}
+                    className="text-xs inline-flex items-center gap-1 text-vibe hover:underline pressable"
+                  >
+                    <Images className="h-3 w-3" />
+                    {pickerFor === q.id ? "Hide gallery" : "Pick from Dude Gallery"}
+                  </button>
+                )}
+
+                {pickerFor === q.id && (
+                  <div className="grid grid-cols-4 gap-2 mt-2 max-h-40 overflow-y-auto p-2 rounded-lg bg-background/40">
+                    {galleryItems.map((it) => (
+                      <button
+                        key={it.id}
+                        onClick={() => {
+                          update(q.id, { poster: it.src });
+                          setPickerFor(null);
+                          toast.success("Background set from gallery.");
+                        }}
+                        className="aspect-square rounded-md overflow-hidden border border-border hover:border-vibe pressable"
+                      >
+                        <img src={it.src} alt="" className="h-full w-full object-cover" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+
                 {q.poster && (
                   <img src={q.poster} alt="" className="mt-2 h-20 w-full object-cover rounded-lg" />
                 )}
