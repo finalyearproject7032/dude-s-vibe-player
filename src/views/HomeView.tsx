@@ -6,6 +6,9 @@ import { AlbumArt } from "@/components/AlbumArt";
 import { timeOfDayGreeting } from "@/lib/playerUtils";
 import { useDudeNation } from "@/lib/dudeNationStore";
 import { DudeNationEditor } from "@/components/DudeNationEditor";
+import { DailyDude } from "@/components/DailyDude";
+import { MoodMixes } from "@/components/MoodMixes";
+import { SettingsSheet } from "@/components/SettingsSheet";
 
 const MOODS: (Mood | "All")[] = ["All", "Hype", "Mass", "Melody", "Emotional", "BGM"];
 const LANGS: ("All" | Lang)[] = ["All", "Telugu", "Tamil"];
@@ -93,13 +96,18 @@ export function HomeView({ onPlay }: Props) {
 
   return (
     <div className="space-y-6 pb-32 animate-fade-in">
-      <header className="px-1">
-        <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Dude Nation</div>
-        <h1 className="font-display text-3xl font-bold leading-tight text-balance">
-          The Dude's World, <span className="vibe-text">{timeOfDayGreeting()}.</span>
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">Your vibe. His songs. Zero rupees.</p>
+      <header className="px-1 flex items-start justify-between gap-3">
+        <div>
+          <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Dude Nation</div>
+          <h1 className="font-display text-3xl font-bold leading-tight text-balance">
+            The Dude's World, <span className="vibe-text">{timeOfDayGreeting()}.</span>
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">Your vibe. His songs. Zero rupees.</p>
+        </div>
+        <SettingsSheet />
       </header>
+
+      <DailyDude onPlay={onPlay} />
 
       {/* Lang toggle */}
       <div className="flex gap-2">
