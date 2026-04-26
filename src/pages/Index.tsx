@@ -11,9 +11,20 @@ import { LibraryView } from "@/views/LibraryView";
 import { SearchView } from "@/views/SearchView";
 import { AddSongView } from "@/views/AddSongView";
 import { GalleryView } from "@/views/GalleryView";
+import { useLyrics } from "@/lib/lyricsStore";
+import { BUILT_IN_LYRICS } from "@/lib/builtInLyrics";
 
 const Index = () => {
   useVibeColor();
+
+  // Seed built-in lyrics once (don't overwrite user edits)
+  useEffect(() => {
+    const existing = useLyrics.getState().lyrics;
+    const setLyrics = useLyrics.getState().setLyrics;
+    for (const [id, raw] of Object.entries(BUILT_IN_LYRICS)) {
+      if (!existing[id]) setLyrics(id, raw);
+    }
+  }, []);
   const [tab, setTab] = useState<Tab>("home");
   const [npOpen, setNpOpen] = useState(false);
   const playSong = usePlayer((s) => s.playSong);
