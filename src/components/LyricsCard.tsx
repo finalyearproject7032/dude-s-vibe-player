@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Pencil, Type } from "lucide-react";
@@ -100,6 +100,7 @@ function Editor({
     <SheetContent side="bottom" className="bg-background/95 backdrop-blur rounded-t-3xl max-h-[85vh] overflow-y-auto">
       <SheetHeader>
         <SheetTitle className="font-display">Lyrics — {title}</SheetTitle>
+        <SheetDescription>Paste plain lyrics or LRC for karaoke-style sync.</SheetDescription>
       </SheetHeader>
       <div className="mt-3 space-y-3 pb-6">
         <p className="text-xs text-muted-foreground">
