@@ -67,6 +67,8 @@ export function NowPlaying({ open, onClose }: Props) {
     if (a) a.currentTime = t;
   };
 
+  const top = useReplay((s) => s.topMoment(song?.id ?? ""));
+
   if (!song) return null;
 
   const isLiked = liked.includes(song.id);
@@ -89,7 +91,6 @@ export function NowPlaying({ open, onClose }: Props) {
     haptic("heavy");
   };
 
-  const top = useReplay((s) => s.topMoment(song?.id ?? ""));
   const fmt = (t: number) => `${Math.floor(t / 60)}:${Math.floor(t % 60).toString().padStart(2, "0")}`;
 
   const onSharePlain = async () => {
