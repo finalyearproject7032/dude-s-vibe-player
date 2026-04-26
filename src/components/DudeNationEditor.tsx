@@ -1,4 +1,4 @@
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -47,6 +47,7 @@ export function DudeNationEditor({ trigger }: Props) {
       <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto bg-background/95 backdrop-blur">
         <SheetHeader>
           <SheetTitle className="font-display">Dude Nation — Quotes</SheetTitle>
+          <SheetDescription>Customize quote text, author, tag, vibe colors, and background image.</SheetDescription>
         </SheetHeader>
 
         <div className="mt-4 flex gap-2">

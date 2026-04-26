@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Moon, X } from "lucide-react";
 import { useSleepTimer } from "@/lib/sleepTimerStore";
@@ -32,6 +32,7 @@ export function SleepTimer({ trigger }: { trigger: React.ReactNode }) {
           <SheetTitle className="font-display flex items-center gap-2">
             <Moon className="h-5 w-5 text-vibe" /> Sleep Timer
           </SheetTitle>
+          <SheetDescription>Stop playback after a delay or at the end of this song.</SheetDescription>
         </SheetHeader>
 
         <div className="mt-4 space-y-4 pb-6">

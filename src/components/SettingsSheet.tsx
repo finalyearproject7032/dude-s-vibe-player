@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
@@ -98,6 +98,7 @@ export function SettingsSheet({ trigger }: { trigger?: React.ReactNode }) {
       <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto bg-background/95 backdrop-blur">
         <SheetHeader>
           <SheetTitle className="font-display">Settings</SheetTitle>
+          <SheetDescription>Tune playback, manage your vault, and back up your Dudify data.</SheetDescription>
         </SheetHeader>
 
         <div className="mt-5 space-y-6 pb-12">
