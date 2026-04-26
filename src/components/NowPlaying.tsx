@@ -67,6 +67,8 @@ export function NowPlaying({ open, onClose }: Props) {
     if (a) a.currentTime = t;
   };
 
+  const top = useReplay((s) => s.topMoment(song?.id ?? ""));
+
   if (!song) return null;
 
   const isLiked = liked.includes(song.id);
