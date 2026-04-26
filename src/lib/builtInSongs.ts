@@ -5,6 +5,7 @@ import posterGang from "@/assets/posters/dude-gang.jpg";
 import posterTopGear from "@/assets/posters/dude-topgear.jpg";
 import posterEmotional from "@/assets/posters/dude-emotional.jpg";
 import posterReview from "@/assets/posters/dude-review.jpg";
+import posterSingari from "@/assets/posters/dude-singari.webp";
 
 // Built-in Dude collection. Metadata inferred from filenames.
 // vibe = [hue1, hue2] used to repaint the UI per song.
@@ -59,6 +60,19 @@ export const BUILT_IN_SONGS: Song[] = [
     poster: posterReview,
     vibe: [300, 200],
     quote: "Some names you whisper. Some you melt into. Singari is both.",
+    builtIn: true,
+  },
+  {
+    id: "singari-tamil",
+    title: "Singari (Tamil)",
+    movie: "Dude",
+    language: "Tamil",
+    mood: "Melody",
+    singer: "Sai Abhyankkar",
+    src: "/songs/singari-tamil.mp3",
+    poster: posterSingari,
+    vibe: [305, 195],
+    quote: "Dude's third gear — Singari, in her mother tongue.",
     builtIn: true,
   },
   {
