@@ -91,7 +91,6 @@ export function NowPlaying({ open, onClose }: Props) {
     haptic("heavy");
   };
 
-  const top = useReplay((s) => s.topMoment(song?.id ?? ""));
   const fmt = (t: number) => `${Math.floor(t / 60)}:${Math.floor(t % 60).toString().padStart(2, "0")}`;
 
   const onSharePlain = async () => {
