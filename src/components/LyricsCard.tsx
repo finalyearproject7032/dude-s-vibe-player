@@ -82,9 +82,8 @@ export function LyricsCard({ song, position }: Props) {
         onEdit={() => { setDraft(raw); setEditorOpen(true); setFullOpen(false); }}
       />
 
-      {/* Editor sheet (shared) */}
+      {/* Editor sheet (shared, opened from full-screen view) */}
       <Sheet open={editorOpen} onOpenChange={(o) => { setEditorOpen(o); if (o) setDraft(raw); }}>
-        <SheetTrigger asChild><span hidden /></SheetTrigger>
         <Editor draft={draft} setDraft={setDraft} onSave={() => { setLyrics(song.id, draft); setEditorOpen(false); }} title={song.title} />
       </Sheet>
     </>
