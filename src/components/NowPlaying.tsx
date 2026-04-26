@@ -67,7 +67,7 @@ export function NowPlaying({ open, onClose }: Props) {
     if (a) a.currentTime = t;
   };
 
-  const top = useReplay((s) => s.topMoment(song?.id ?? ""));
+  const top = useReplay((s) => (song ? s.topMoment(song.id) : null));
 
   if (!song) return null;
 
