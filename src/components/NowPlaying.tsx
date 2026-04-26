@@ -67,7 +67,20 @@ export function NowPlaying({ open, onClose }: Props) {
     if (a) a.currentTime = t;
   };
 
-  const top = useReplay((s) => (song ? s.topMoment(song.id) : null));
+  const replayHeat = useReplay((s) => (song ? s.heat[song.id] : undefined));
+  const top = useMemo(() => {
+    if (!replayHeat) return null;
+    let bestBucket = -1;
+    let bestScore = 0;
+    for (const [bucket, score] of Object.entries(replayHeat)) {
+      if (score > bestScore) {
+        bestScore = score;
+        bestBucket = Number(bucket);
+      }
+    }
+    if (bestBucket < 0 || bestScore < 15) return null;
+    return { start: bestBucket * 10, end: (bestBucket + 1) * 10, score: bestScore };
+  }, [replayHeat]);
 
   if (!song) return null;
 
